@@ -9,30 +9,40 @@ class App extends React.Component {
 
   state = {
     addData: true,
-    editData: true,
+    editData: false,
     showData: false,
-    id: 1,
+    unique_id: 0,
+    id: 0,
     subject: '',
     priority: '3',
-    status: '1',
+    status: 1,
     user: '',
     assigned_user: '',
     data: []
   }
 
+  componentDidMount() {
+    this.setState({
+      data: localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [],
+      id: localStorage.getItem('id') ? parseInt(localStorage.getItem('id')) : 0
+    })
+  }
+
   toggleData = () => {
     this.setState({
+      showData: !this.state.showData,
       addData: !this.state.addData
     })
   }
   editData = async (id) => {
     const filteredItems = this.state.data.filter(item =>
       item.id === id);
-    console.log(filteredItems);
     await this.setState({
       addData: false,
       editData: true,
+      showData: false,
       id: id,
+      unique_id: this.state.id,
       subject: filteredItems[0].subject,
       priority: filteredItems[0].priority,
       status: filteredItems[0].status,
@@ -46,12 +56,13 @@ class App extends React.Component {
     this.setState({
       data: filteredItems
     })
+    localStorage.setItem('data', JSON.stringify(filteredItems));
   }
   handleChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   }
   submitHandler = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     let itemData = [];
     if (!this.state.subject && !this.state.priority && !this.state.status && !this.state.user && !this.state.assigned_user) {
       alert('Please Fill all the fields.');
@@ -59,15 +70,17 @@ class App extends React.Component {
     else {
       if (this.state.addData) {
         const newItem = {
-          id: this.state.editData ? this.state.id : this.state.id + 1,
+          id: this.state.id + 1,
           subject: this.state.subject,
           priority: this.state.priority,
           status: this.state.status,
           user: this.state.user,
           assigned_user: this.state.assigned_user
         }
+
         itemData = this.state.data ? this.state.data : [];
         itemData.push(newItem);
+
       }
       else if (this.state.editData) {
         itemData = this.state.data;
@@ -88,15 +101,18 @@ class App extends React.Component {
         status: '1',
         user: '',
         assigned_user: '',
-        id: this.state.editData ? this.state.id : this.state.id + 1,
+        id: this.state.editData ? this.state.unique_id : this.state.id + 1,
         addData: false,
-        editData: false
+        editData: false,
+        showData: true
       });
+      localStorage.setItem('data', JSON.stringify(itemData));
+      localStorage.setItem('id', this.state.editData ? this.state.unique_id : this.state.id);
     }
   }
 
   render() {
-    console.log(this.state);
+    const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : []
     return (
       <div>
         <div>
@@ -106,16 +122,16 @@ class App extends React.Component {
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <div onClick={this.toggleData}>
                 <IconButton edge="start" color="inherit" aria-label="menu">
-                  {this.state.addData || this.state.editData ? 'Show Tickets' : 'Create Tickets'}
+                  {!this.state.showData ? 'Show Tickets' : 'Create Tickets'}
                 </IconButton>
               </div>
             </Toolbar>
           </AppBar>
         </div>
         <center>
-          <div className={this.state.addData ? 'addDataForm' : 'showData'} style={{ 'box-shadow': '2px 5px 13px 0px #ccc', 'border': '1px solid #fff', 'border-radius': '10px' }}>
+          <div className={!this.state.showData ? 'addDataForm' : 'showData'} style={{ 'box-shadow': '2px 5px 13px 0px #ccc', 'border': '1px solid #fff', 'border-radius': '10px' }}>
             {
-              this.state.addData || this.state.editData ?
+              !this.state.showData ?
                 <div>
                   <form onSubmit={(e) => this.submitHandler(e)}>
                     <center>
@@ -137,7 +153,7 @@ class App extends React.Component {
                           id="demo-simple-select"
                           name="status"
                           onChange={(e) => this.handleChange(e)}
-                          value={1}
+                          value={this.state.status}
                         >
                           <MenuItem value={1}>Open</MenuItem>
                           <MenuItem value={2}>In Progress</MenuItem>
@@ -166,7 +182,7 @@ class App extends React.Component {
                     </TableHead>
                     <TableBody>
                       {
-                        this.state.data.map(row => (
+                        data.map(row => (
                           <TableRow hover key={row.id}>
                             <TableCell align="center">{row.id}</TableCell>
                             <TableCell align="center">{row.subject}</TableCell>
@@ -177,7 +193,18 @@ class App extends React.Component {
                                 max={3}
                                 readOnly />
                             </TableCell>
-                            <TableCell align="center">{row.status}</TableCell>
+                            <TableCell align="center">
+                              <FormControl style={{ 'min-width': '100px' }} disabled>
+                                <Select
+                                  name="statusShow"
+                                  value={row.status}
+                                >
+                                  <MenuItem value={1}>Open</MenuItem>
+                                  <MenuItem value={2}>In Progress</MenuItem>
+                                  <MenuItem value={3}>Close</MenuItem>
+                                </Select>
+                              </FormControl>
+                            </TableCell>
                             <TableCell align="center">{row.user}</TableCell>
                             <TableCell align="center">{row.assigned_user}</TableCell>
                             <TableCell align="center">
