@@ -10,7 +10,8 @@ class App extends React.Component {
   state = {
     addData: true,
     editData: true,
-    id: 0,
+    showData: false,
+    id: 1,
     subject: '',
     priority: '3',
     status: '1',
@@ -21,8 +22,7 @@ class App extends React.Component {
 
   toggleData = () => {
     this.setState({
-      addData: !this.state.addData,
-      editData: !this.state.editData
+      addData: !this.state.addData
     })
   }
   editData = async (id) => {
@@ -33,11 +33,11 @@ class App extends React.Component {
       addData: false,
       editData: true,
       id: id,
-      subject: filteredItems.subject,
-      priority: filteredItems.priority,
-      status: filteredItems.status,
-      user: filteredItems.user,
-      assigned_user: filteredItems.assigned_user
+      subject: filteredItems[0].subject,
+      priority: filteredItems[0].priority,
+      status: filteredItems[0].status,
+      user: filteredItems[0].user,
+      assigned_user: filteredItems[0].assigned_user
     })
   }
   deleteData = id => {
@@ -50,30 +50,47 @@ class App extends React.Component {
   handleChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   }
-  submitHandler = (e) => {
+  submitHandler = async (e) => {
     e.preventDefault();
+    let itemData = [];
     if (!this.state.subject && !this.state.priority && !this.state.status && !this.state.user && !this.state.assigned_user) {
       alert('Please Fill all the fields.');
     }
     else {
-      const newItem = {
-        id: this.state.id + 1,
-        subject: this.state.subject,
-        priority: this.state.priority,
-        status: this.state.status,
-        user: this.state.user,
-        assigned_user: this.state.assigned_user
+      if (this.state.addData) {
+        const newItem = {
+          id: this.state.editData ? this.state.id : this.state.id + 1,
+          subject: this.state.subject,
+          priority: this.state.priority,
+          status: this.state.status,
+          user: this.state.user,
+          assigned_user: this.state.assigned_user
+        }
+        itemData = this.state.data ? this.state.data : [];
+        itemData.push(newItem);
       }
-      const itemData = this.state.data ? this.state.data : [];
-      itemData.push(newItem);
-      this.setState({
+      else if (this.state.editData) {
+        itemData = this.state.data;
+        itemData.map(item => {
+          if (item.id === this.state.id) {
+            item.subject = this.state.subject;
+            item.priority = this.state.priority;
+            item.status = this.state.status;
+            item.user = this.state.user;
+            item.assigned_user = this.state.assigned_user;
+          }
+        })
+      }
+      await this.setState({
         data: itemData,
         subject: '',
         priority: '3',
         status: '1',
         user: '',
         assigned_user: '',
-        id: this.state.id + 1
+        id: this.state.editData ? this.state.id : this.state.id + 1,
+        addData: false,
+        editData: false
       });
     }
   }
@@ -89,7 +106,7 @@ class App extends React.Component {
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <div onClick={this.toggleData}>
                 <IconButton edge="start" color="inherit" aria-label="menu">
-                  {this.state.addData ? 'Show Tickets' : 'Create Tickets'}
+                  {this.state.addData || this.state.editData ? 'Show Tickets' : 'Create Tickets'}
                 </IconButton>
               </div>
             </Toolbar>
@@ -110,7 +127,7 @@ class App extends React.Component {
                         max={3}
                         onChange={(e) => this.handleChange(e)}
                       /><br /><br />
-                      <TextField multiline label='Subject' name='subject' onChange={(e) => this.handleChange(e)} /> <br /><br />
+                      <TextField multiline label='Subject' value={this.state.subject} name='subject' onChange={(e) => this.handleChange(e)} /> <br /><br />
 
 
                       <FormControl style={{ 'min-width': '200px' }} disabled={this.state.addData}>
@@ -127,8 +144,8 @@ class App extends React.Component {
                           <MenuItem value={3}>Close</MenuItem>
                         </Select>
                       </FormControl><br /><br />
-                      <TextField label='User' name='user' onChange={(e) => this.handleChange(e)} /><br /><br />
-                      <TextField label='Assigned User' name='assigned_user' onChange={(e) => this.handleChange(e)} /><br /><br />
+                      <TextField label='User' value={this.state.user} name='user' onChange={(e) => this.handleChange(e)} /><br /><br />
+                      <TextField label='Assigned User' value={this.state.assigned_user} name='assigned_user' onChange={(e) => this.handleChange(e)} /><br /><br />
                       <button className='btn'>{this.state.addData ? 'Add' : 'Update'}</button><br /><br />
                     </center>
                   </form>
