@@ -112,7 +112,7 @@ class App extends React.Component {
   }
 
   render() {
-    const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : []
+
     return (
       <div>
         <div>
@@ -182,7 +182,7 @@ class App extends React.Component {
                     </TableHead>
                     <TableBody>
                       {
-                        data.map(row => (
+                        this.state.data.map(row => (
                           <TableRow hover key={row.id}>
                             <TableCell align="center">{row.id}</TableCell>
                             <TableCell align="center">{row.subject}</TableCell>
