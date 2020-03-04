@@ -26,7 +26,7 @@ class App extends React.Component {
     this.setState({
       data: localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [],
       id: localStorage.getItem('id') ? parseInt(localStorage.getItem('id')) : 0,
-      clearStorage: localStorage.getItem('data') && JSON.parse(localStorage.getItem('data')).length == 0 || !localStorage.getItem('data') ? true : false
+      clearStorage: (localStorage.getItem('data') && JSON.parse(localStorage.getItem('data')).length === 0) || !localStorage.getItem('data') ? true : false
     })
   }
 
@@ -53,19 +53,23 @@ class App extends React.Component {
     })
   }
   deleteData = id => {
-    alert(id);
     const filteredItems = this.state.data.filter(item =>
       item.id !== id);
 
     this.setState({
       data: filteredItems,
-      clearStorage: filteredItems.length == 0
+      clearStorage: filteredItems.length === 0
     })
     localStorage.setItem('data', JSON.stringify(filteredItems));
   }
+  handleBlur = (e) => {
+    this.setState({ [e.target.name]: e.target.value.trim() });
+  }
+
   handleChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   }
+
   submitHandler = async (e) => {
     // e.preventDefault();
     let itemData = [];
@@ -125,10 +129,6 @@ class App extends React.Component {
     })
   }
 
-  filterPriority() {
-    alert('Priority');
-  }
-
   render() {
     return (
       <div>
@@ -141,16 +141,16 @@ class App extends React.Component {
             {
               !this.state.showData ?
                 <AddData
-                  Data = {this.state}
-                  HandleChange = {this.handleChange.bind(this)}
-                  SubmitHandler = {this.submitHandler.bind(this)}
+                  Data={this.state}
+                  Handleblur={this.handleBlur.bind(this)}
+                  HandleChange={this.handleChange.bind(this)}
+                  SubmitHandler={this.submitHandler.bind(this)}
                 />
                 :
                 <ShowData
-                  FilterPriority={this.filterPriority.bind(this)}
                   ClearStorage={this.clearLocalStorage.bind(this)}
-                  ClearStorageBool={this.state.clearStorage}
                   Data={this.state.data}
+                  ClearStorageBool={this.state.clearStorage}
                   EditData={this.editData.bind(this)}
                   DeleteData={this.deleteData.bind(this)}
                 />
