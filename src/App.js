@@ -1,9 +1,9 @@
 import React from 'react';
 import './App.css';
 import 'font-awesome/css/font-awesome.min.css';
-import { AppBar, TextField, Button, FormControlLabel, Switch, Typography, FormControl, MenuItem, InputLabel, Select, Toolbar, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
-import Rating from '@material-ui/lab/Rating';
+import AppHeader from './components/AppHeader';
+import ShowData from './components/ShowData';
+import AddData from './components/AddData';
 
 class App extends React.Component {
 
@@ -26,7 +26,7 @@ class App extends React.Component {
     this.setState({
       data: localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [],
       id: localStorage.getItem('id') ? parseInt(localStorage.getItem('id')) : 0,
-      clearStorage: localStorage.getItem('data') ? false : true
+      clearStorage: localStorage.getItem('data') && JSON.parse(localStorage.getItem('data')).length == 0 || !localStorage.getItem('data') ? true : false
     })
   }
 
@@ -53,6 +53,7 @@ class App extends React.Component {
     })
   }
   deleteData = id => {
+    alert(id);
     const filteredItems = this.state.data.filter(item =>
       item.id !== id);
 
@@ -118,130 +119,42 @@ class App extends React.Component {
   clearLocalStorage() {
     localStorage.clear();
     this.setState({
+      id: 0,
       data: [],
       clearStorage: true
     })
   }
 
+  filterPriority() {
+    alert('Priority');
+  }
+
   render() {
     return (
       <div>
-        <div>
-          <AppBar position='static' style={{ backgroundColor: '#006A69' }}>
-            <Toolbar>
-              <span style={{ 'font-size': '21px' }}><i className="fa fa-ticket"></i> Support Tickets</span>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <div onClick={this.toggleData}>
-                <IconButton edge="start" color="inherit" aria-label="menu">
-                  {!this.state.showData ? 'Show Tickets' : 'Create Tickets'}
-                </IconButton>
-              </div>
-            </Toolbar>
-          </AppBar>
-        </div>
+        <AppHeader
+          toggleFunction={this.toggleData}
+          showData={this.state.showData}
+        />
         <center>
           <div className={!this.state.showData ? 'addDataForm' : 'showData'} style={{ 'box-shadow': '2px 5px 13px 0px #ccc', 'border': '1px solid #fff', 'border-radius': '10px' }}>
             {
               !this.state.showData ?
-                <div>
-                  <form onSubmit={(e) => this.submitHandler(e)}>
-                    <center>
-                      <br /><br />
-                      <Typography>Priority</Typography>
-                      <Rating
-                        name="priority"
-                        value={this.state.priority}
-                        max={3}
-                        onChange={(e) => this.handleChange(e)}
-                      /><br /><br />
-                      <TextField multiline label='Subject' value={this.state.subject} name='subject' onChange={(e) => this.handleChange(e)} /> <br /><br />
-                      <FormControl style={{ 'min-width': '200px' }} disabled={this.state.addData}>
-                        <InputLabel>Status</InputLabel>
-                        <Select
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
-                          name="status"
-                          onChange={(e) => this.handleChange(e)}
-                          value={this.state.status}
-                        >
-                          <MenuItem value={1}>Open</MenuItem>
-                          <MenuItem value={2}>In Progress</MenuItem>
-                          <MenuItem value={3}>Close</MenuItem>
-                        </Select>
-                      </FormControl><br /><br />
-                      <TextField label='User' value={this.state.user} name='user' onChange={(e) => this.handleChange(e)} /><br /><br />
-                      <TextField label='Assigned User' value={this.state.assigned_user} name='assigned_user' onChange={(e) => this.handleChange(e)} /><br /><br />
-                      <button className='btn'>{this.state.addData ? 'Add' : 'Update'}</button><br /><br />
-                    </center>
-                  </form>
-                </div>
+                <AddData
+                  Data = {this.state}
+                  HandleChange = {this.handleChange.bind(this)}
+                  SubmitHandler = {this.submitHandler.bind(this)}
+                />
                 :
+                <ShowData
+                  FilterPriority={this.filterPriority.bind(this)}
+                  ClearStorage={this.clearLocalStorage.bind(this)}
+                  ClearStorageBool={this.state.clearStorage}
+                  Data={this.state.data}
+                  EditData={this.editData.bind(this)}
+                  DeleteData={this.deleteData.bind(this)}
+                />
 
-                <TableContainer style={{ 'border-radius': '10px' }}>
-                  <FormControlLabel
-                    control={
-                      <Switch value="checkedA" color="primary" align="right" />
-                    }
-                    label="Priority"
-                  />
-                  <Button onClick={this.clearLocalStorage.bind(this)} variant="contained" color="secondary" disabled={this.state.clearStorage}>Clear</Button>
-                  <Table aria-label="simple table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell align="center">Id</TableCell>
-                        <TableCell align="center">Subject</TableCell>
-                        <TableCell align="center">Priority</TableCell>
-                        <TableCell align="center">Status</TableCell>
-                        <TableCell align="center">User</TableCell>
-                        <TableCell align="center">Assigned User</TableCell>
-                        <TableCell align="center">Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {
-                        this.state.data.map(row => (
-                          <TableRow hover key={row.id}>
-                            <TableCell align="center">{row.id}</TableCell>
-                            <TableCell align="center">{row.subject}</TableCell>
-                            <TableCell align="center">
-                              <Rating
-                                name="priority_value"
-                                value={row.priority}
-                                max={3}
-                                readOnly />
-                            </TableCell>
-                            <TableCell align="center">
-                              <FormControl style={{ 'min-width': '100px' }} disabled>
-                                <Select
-                                  name="statusShow"
-                                  value={row.status}
-                                >
-                                  <MenuItem value={1}>Open</MenuItem>
-                                  <MenuItem value={2}>In Progress</MenuItem>
-                                  <MenuItem value={3}>Close</MenuItem>
-                                </Select>
-                              </FormControl>
-                            </TableCell>
-                            <TableCell align="center">{row.user}</TableCell>
-                            <TableCell align="center">{row.assigned_user}</TableCell>
-                            <TableCell align="center">
-                              <span onClick={() => this.editData(row.id)}>
-                                <IconButton>
-                                  <EditIcon />
-                                </IconButton>
-                              </span>
-                              <span onClick={() => this.deleteData(row.id)}>
-                                <IconButton color='secondary'>
-                                  <DeleteIcon />
-                                </IconButton>
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      }
-                    </TableBody>
-                  </Table>
-                </TableContainer>
             }
 
           </div>
