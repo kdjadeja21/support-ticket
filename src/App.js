@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import 'font-awesome/css/font-awesome.min.css';
-import { AppBar, TextField, Typography, FormControl, MenuItem, InputLabel, Select, Toolbar, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { AppBar, TextField, Button, FormControlLabel, Switch, Typography, FormControl, MenuItem, InputLabel, Select, Toolbar, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
 import Rating from '@material-ui/lab/Rating';
 
@@ -11,6 +11,7 @@ class App extends React.Component {
     addData: true,
     editData: false,
     showData: false,
+    clearStorage: true,
     unique_id: 0,
     id: 0,
     subject: '',
@@ -24,7 +25,8 @@ class App extends React.Component {
   componentDidMount() {
     this.setState({
       data: localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [],
-      id: localStorage.getItem('id') ? parseInt(localStorage.getItem('id')) : 0
+      id: localStorage.getItem('id') ? parseInt(localStorage.getItem('id')) : 0,
+      clearStorage: localStorage.getItem('data') ? false : true
     })
   }
 
@@ -53,8 +55,10 @@ class App extends React.Component {
   deleteData = id => {
     const filteredItems = this.state.data.filter(item =>
       item.id !== id);
+
     this.setState({
-      data: filteredItems
+      data: filteredItems,
+      clearStorage: filteredItems.length == 0
     })
     localStorage.setItem('data', JSON.stringify(filteredItems));
   }
@@ -79,7 +83,7 @@ class App extends React.Component {
         }
 
         itemData = this.state.data ? this.state.data : [];
-        itemData.push(newItem);
+        itemData.unshift(newItem);
 
       }
       else if (this.state.editData) {
@@ -104,15 +108,22 @@ class App extends React.Component {
         id: this.state.editData ? this.state.unique_id : this.state.id + 1,
         addData: false,
         editData: false,
-        showData: true
+        showData: true,
+        clearStorage: false
       });
       localStorage.setItem('data', JSON.stringify(itemData));
       localStorage.setItem('id', this.state.editData ? this.state.unique_id : this.state.id);
     }
   }
+  clearLocalStorage() {
+    localStorage.clear();
+    this.setState({
+      data: [],
+      clearStorage: true
+    })
+  }
 
   render() {
-
     return (
       <div>
         <div>
@@ -144,8 +155,6 @@ class App extends React.Component {
                         onChange={(e) => this.handleChange(e)}
                       /><br /><br />
                       <TextField multiline label='Subject' value={this.state.subject} name='subject' onChange={(e) => this.handleChange(e)} /> <br /><br />
-
-
                       <FormControl style={{ 'min-width': '200px' }} disabled={this.state.addData}>
                         <InputLabel>Status</InputLabel>
                         <Select
@@ -167,7 +176,15 @@ class App extends React.Component {
                   </form>
                 </div>
                 :
+
                 <TableContainer style={{ 'border-radius': '10px' }}>
+                  <FormControlLabel
+                    control={
+                      <Switch value="checkedA" color="primary" align="right" />
+                    }
+                    label="Priority"
+                  />
+                  <Button onClick={this.clearLocalStorage.bind(this)} variant="contained" color="secondary" disabled={this.state.clearStorage}>Clear</Button>
                   <Table aria-label="simple table">
                     <TableHead>
                       <TableRow>
