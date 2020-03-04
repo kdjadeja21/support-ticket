@@ -1,16 +1,16 @@
 import React from 'react';
-import { Button, FormControlLabel, Switch, FormControl, MenuItem, Select, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Button, FormControl, MenuItem, Select, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
 import Rating from '@material-ui/lab/Rating';
 
 
 export default class ShowData extends React.Component {
 
-    deleteData(id) {
+    deleteData = id => e => {
         this.props.DeleteData(id);
     }
 
-    editData(id) {
+    editData = id => e => {
         this.props.EditData(id);
     }
 
@@ -42,12 +42,12 @@ export default class ShowData extends React.Component {
                         </FormControl>
                     </TableCell>
                     <TableCell align="center">
-                        <span onClick={() => this.editData(row.id)}>
+                        <span onClick={this.editData(row.id)}>
                             <IconButton>
                                 <EditIcon />
                             </IconButton>
                         </span>
-                        <span onClick={() => this.deleteData(row.id)}>
+                        <span onClick={this.deleteData(row.id)}>
                             <IconButton color='secondary'>
                                 <DeleteIcon />
                             </IconButton>

@@ -3,14 +3,14 @@ import { TextField, Typography, FormControl, MenuItem, InputLabel, Select } from
 import Rating from '@material-ui/lab/Rating';
 
 export default class AddData extends React.Component {
-    handleBlur(e) {
+    handleBlur = e => {
         this.props.Handleblur(e);
     }
-    handleChange(e) {
+    handleChange = e => {
         this.props.HandleChange(e);
     }
 
-    submitHandler(e) {
+    submitHandler = e => {
         this.props.SubmitHandler(e);
     }
     render() {
@@ -24,15 +24,15 @@ export default class AddData extends React.Component {
                             name="priority"
                             value={this.props.Data.priority}
                             max={3}
-                            onChange={(e) => this.handleChange(e)}
+                            onChange={this.handleChange}
                         /><br /><br />
                         <TextField
                             multiline
                             label='Subject'
                             value={this.props.Data.subject}
                             name='subject'
-                            onChange={(e) => this.handleChange(e)}
-                            onBlur={(e) => { this.handleBlur(e) }}
+                            onChange={this.handleChange}
+                            onBlur={this.handleBlur}
                             required
                         /> <br /><br />
                         <FormControl style={{ 'min-width': '200px' }} disabled={this.props.Data.addData}>
@@ -41,7 +41,7 @@ export default class AddData extends React.Component {
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 name="status"
-                                onChange={(e) => this.handleChange(e)}
+                                onChange={this.handleChange}
                                 value={this.props.Data.status}
                             >
                                 <MenuItem value={1}>Open</MenuItem>
@@ -53,19 +53,21 @@ export default class AddData extends React.Component {
                             label='User'
                             value={this.props.Data.user}
                             name='user'
-                            onBlur={(e) => { this.handleBlur(e) }}
-                            onChange={(e) => this.handleChange(e)}
+                            onBlur={this.handleBlur}
+                            onChange={this.handleChange}
                             required
                         /><br /><br />
                         <TextField
                             label='Assigned User'
                             value={this.props.Data.assigned_user}
                             name='assigned_user'
-                            onBlur={(e) => { this.handleBlur(e) }}
-                            onChange={(e) => this.handleChange(e)}
+                            onBlur={this.handleBlur}
+                            onChange={this.handleChange}
                             required
                         /><br /><br />
-                        <button className='btn'>{this.props.Data.addData ? 'Add' : 'Update'}</button><br /><br />
+                        <button className='btn'>
+                            {this.props.Data.addData ? 'Add' : 'Update'}
+                        </button><br /><br />
                     </center>
                 </form>
             </div>

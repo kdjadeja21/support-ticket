@@ -95,11 +95,13 @@ class App extends React.Component {
         itemData = this.state.data;
         itemData.map(item => {
           if (item.id === this.state.id) {
-            item.subject = this.state.subject;
-            item.priority = this.state.priority;
-            item.status = this.state.status;
-            item.user = this.state.user;
-            item.assigned_user = this.state.assigned_user;
+            return (
+              item.subject = this.state.subject,
+              item.priority = this.state.priority,
+              item.status = this.state.status,
+              item.user = this.state.user,
+              item.assigned_user = this.state.assigned_user
+            )
           }
         })
       }
@@ -120,7 +122,7 @@ class App extends React.Component {
       localStorage.setItem('id', this.state.editData ? this.state.unique_id : this.state.id);
     }
   }
-  clearLocalStorage() {
+  clearLocalStorage = () => {
     localStorage.clear();
     this.setState({
       id: 0,
@@ -137,22 +139,24 @@ class App extends React.Component {
           showData={this.state.showData}
         />
         <center>
-          <div className={!this.state.showData ? 'addDataForm' : 'showData'} style={{ 'box-shadow': '2px 5px 13px 0px #ccc', 'border': '1px solid #fff', 'border-radius': '10px' }}>
+          <div
+            className={!this.state.showData ? 'addDataForm' : 'showData'}
+            style={{ 'box-shadow': '2px 5px 13px 0px #ccc', 'border': '1px solid #fff', 'border-radius': '10px' }}>
             {
               !this.state.showData ?
                 <AddData
                   Data={this.state}
-                  Handleblur={this.handleBlur.bind(this)}
-                  HandleChange={this.handleChange.bind(this)}
-                  SubmitHandler={this.submitHandler.bind(this)}
+                  Handleblur={this.handleBlur}
+                  HandleChange={this.handleChange}
+                  SubmitHandler={this.submitHandler}
                 />
                 :
                 <ShowData
-                  ClearStorage={this.clearLocalStorage.bind(this)}
+                  ClearStorage={this.clearLocalStorage}
                   Data={this.state.data}
                   ClearStorageBool={this.state.clearStorage}
-                  EditData={this.editData.bind(this)}
-                  DeleteData={this.deleteData.bind(this)}
+                  EditData={this.editData}
+                  DeleteData={this.deleteData}
                 />
 
             }
